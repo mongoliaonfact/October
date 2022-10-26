@@ -41,3 +41,8 @@ vignettes/*.pdf
 
 # ignore dataset
 Oct_data.zip
+data
+codes/Oct_data
+
+# ignore the results
+codes/version101.docx

@@ -1,11 +1,9 @@
 ---
 title: "SIZ October data"
 author: "bbaasan"
-date: '2022-10-24'
-output: 
-  word_document: 
-    toc: yes
-  
+date: "2022-10-24"
+output:
+  word_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -16,25 +14,43 @@ knitr::opts_chunk$set(echo = TRUE)
 
 This is an R Markdown document for October data. 
 
-```{r include=FALSE, message=FALSE}
+
+```{r echo=FALSE, include=FALSE, warning=FALSE, message=FALSE}
+# this chunk is for WINDOWS
+
 library(tidyverse)
-
-```
-
-
-```{r cleaning data, include=FALSE}
-library(readr)
-library(lubridate)
-
-appear14 <- read_csv("/Users/bb/Documents/Arlington/Arlington/data/Oct/appearances 2022-10/appearances_2022-10-14.csv") %>%
+library(magick)
+#list.files('../data/appearances 2022-10')
+appear14 <- read_csv("../data/appearances 2022-10/appearances_2022-10-14.csv") %>%
   select(ts, user_id, device_id, bird_view) %>% 
   mutate(timestamp = as.POSIXct(ts, tz='EST')) %>% 
   select(ts, timestamp, user_id, device_id, bird_view) %>% 
   mutate(did = str_replace(device_id, '-.*', '')) %>% 
   mutate(yes_no = if_else(grepl('^P', bird_view) == TRUE, "Yes", "No")) %>% 
   select(timestamp, user_id, did, bird_view, yes_no)
+
 ```
-# Header 1
+
+```{r echo=FALSE}
+
+knitr::include_graphics("location.jpg")
+```
+
+```{r cleaning data, include=FALSE}
+# this is Mac snippet. Use previous chuck for Windows
+
+#library(readr)
+#library(lubridate)
+
+#appear14 <- read_csv("/Users/bb/Documents/Arlington/Arlington/data/Oct/appearances #2022-10/appearances_2022-10-14.csv") %>%
+#  select(ts, user_id, device_id, bird_view) %>% 
+#  mutate(timestamp = as.POSIXct(ts, tz='EST')) %>% 
+#  select(ts, timestamp, user_id, device_id, bird_view) %>% 
+#  mutate(did = str_replace(device_id, '-.*', '')) %>% 
+#  mutate(yes_no = if_else(grepl('^P', bird_view) == TRUE, "Yes", "No")) %>% 
+#  select(timestamp, user_id, did, bird_view, yes_no)
+```
+[image]("/codes/location.jpg")
 Let's review whether there are empty or non-assigned geo points for any cells.
 ```{r review, echo=FALSE, comment=NA}
 appear14 %>% 
@@ -42,7 +58,7 @@ appear14 %>%
 
 ```
 Data seems to contain no empty cells for geographical location for each row cell.
-```{r Counting timestamp, echo=FALSE}
+```{r Counting timestamp, echo=FALSE, comment=NA}
 did.table <- as.data.frame(appear14 %>% 
   select(timestamp, did) %>% 
   group_by(did) %>% count(did))
@@ -58,14 +74,15 @@ did.table %>%
   ylab('Number of Objects Detected by the Device id') +
   coord_flip()
 ```
-```{r creating timeseries table, echo=FALSE}
+
+```{r creating timeseries table, echo=FALSE, comment=NA}
 appear14 %>% 
   select(timestamp, user_id, did) %>% 
   group_by(timestamp, did) %>% count(user_id) %>% 
   head()
 ```
 
-```{r}
+```{r echo=FALSE, comment=NA}
 seq.POSIXt(as.POSIXct('2022-10-14 00:00:00'), 
            as.POSIXct('2022-10-14 23:59:59'), by = "2 hour") %>% 
   head()
@@ -75,4 +92,3 @@ seq.POSIXt(as.POSIXct('2022-10-14 00:00:00'),
 # Two-hours of time interval aggregation (timestamp column) and review the user id: its frequency, count, total number of   user id, sense of tracking individuals 
 # Geo locations (bird view) into visible demonstration of area of the recordings
 ```
-
