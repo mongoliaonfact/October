@@ -79,13 +79,16 @@ main_tbl %>% head()
 ```
 
 ```{r echo=FALSE, comment=NA}
-appear14 %>% 
+# FUNC 4: remove parenthesis from POINT column and split the column into
+rmove_parenthesis <- function(df){
+        df$bird_view <- gsub('[()]', '', df$bird_view)
+        df %>% 
+                separate(bird_view, c('Point', 'Y', 'X'), sep = ' ')}
+
+rmove_parenthesis(appear14) %>% 
+  mutate(twohours = cut(timestamp, breaks = '2 hours')) %>% 
+  select(timestamp, twohours) %>% 
   head()
-
-
-  #select(timestamp, did) %>% 
-  #mutate(twohours = cut(timestamp, breaks = '2 hours')) %>% 
-  #select(timestamp, twohours) %>% 
   #group_by(did, twohours) %>%
   #count(twohours) 
 ```
