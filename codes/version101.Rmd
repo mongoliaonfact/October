@@ -15,14 +15,9 @@ knitr::opts_chunk$set(echo = TRUE)
 
 This is an R Markdown document for October data. 
 
-```{r echo=FALSE}
-
-#knitr::include_graphics("location.jpg")
-
-```
 ![Arlington SIZ area and its Fixtures](../images/location.jpg)
 
-```{r cleaning data, include=FALSE}
+```{r cleaning data, include=FALSE, warning=FALSE}
 library(readr)
 library(lubridate)
 library(tidyverse)
@@ -70,21 +65,27 @@ appear14 %>%
   head()
 ```
 
-```{r echo=FALSE, comment=NA}
-seq.POSIXt(as.POSIXct('2022-10-14 00:00:00', tz='EST'), 
-           as.POSIXct('2022-10-14 23:59:59', tz='EST'), by = "2 hour") %>% 
-  head()
+```{r creating main time table, echo=FALSE, comment=NA}
+timestamp <- seq.POSIXt(as.POSIXct('2022-10-14 00:00:00', tz='EST'), 
+           as.POSIXct('2022-10-14 23:59:59', tz='EST'), by = "2 hour")
+
+main_tbl <- as.data.frame(timestamp)
+main_tbl %>% head()
 
 # We will look for missing values in the bird view column in the Appearance table.
 # Do query on device id and its recordings. Whether there are times when device id does not produce any data
 # Two-hours of time interval aggregation (timestamp column) and review the user id: its frequency, count, total number of   user id, sense of tracking individuals 
 # Geo locations (bird view) into visible demonstration of area of the recordings
 ```
+
 ```{r echo=FALSE, comment=NA}
-appear14 %>%
-  select(timestamp, did) %>% 
-  mutate(twohours = cut(timestamp, breaks = '2 hours')) %>% 
-  select(timestamp, twohours) %>% 
-  group_by(did, twohours) %>%
-  count(twohours) 
+appear14 %>% 
+  head()
+
+
+  #select(timestamp, did) %>% 
+  #mutate(twohours = cut(timestamp, breaks = '2 hours')) %>% 
+  #select(timestamp, twohours) %>% 
+  #group_by(did, twohours) %>%
+  #count(twohours) 
 ```
