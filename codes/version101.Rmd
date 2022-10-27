@@ -8,49 +8,37 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+
 ```
 
 ## R Markdown
 
 This is an R Markdown document for October data. 
 
+```{r echo=FALSE}
 
-```{r echo=FALSE, include=FALSE, warning=FALSE, message=FALSE}
-# this chunk is for WINDOWS
+#knitr::include_graphics("location.jpg")
 
+```
+![Arlington SIZ area and its Fixtures](../images/location.jpg)
+
+```{r cleaning data, include=FALSE}
+library(readr)
+library(lubridate)
 library(tidyverse)
-library(magick)
-#list.files('../data/appearances 2022-10')
-appear14 <- read_csv("../data/appearances 2022-10/appearances_2022-10-14.csv") %>%
+
+# for Windows
+appear14 <- read_csv("../data/appearances 2022-10/appearances_2022-10-14.csv") %>% 
+  # for MAC
+  #appear14 <- read_csv("/Users/bb/Documents/Arlington/Arlington/data/Oct/appearances 2022-10/appearances_2022-10-14.csv") %>%
   select(ts, user_id, device_id, bird_view) %>% 
   mutate(timestamp = as.POSIXct(ts, tz='EST')) %>% 
   select(ts, timestamp, user_id, device_id, bird_view) %>% 
   mutate(did = str_replace(device_id, '-.*', '')) %>% 
   mutate(yes_no = if_else(grepl('^P', bird_view) == TRUE, "Yes", "No")) %>% 
   select(timestamp, user_id, did, bird_view, yes_no)
-
 ```
 
-```{r echo=FALSE}
-
-knitr::include_graphics("location.jpg")
-```
-
-```{r cleaning data, include=FALSE}
-# this is Mac snippet. Use previous chuck for Windows
-
-#library(readr)
-#library(lubridate)
-
-#appear14 <- read_csv("/Users/bb/Documents/Arlington/Arlington/data/Oct/appearances #2022-10/appearances_2022-10-14.csv") %>%
-#  select(ts, user_id, device_id, bird_view) %>% 
-#  mutate(timestamp = as.POSIXct(ts, tz='EST')) %>% 
-#  select(ts, timestamp, user_id, device_id, bird_view) %>% 
-#  mutate(did = str_replace(device_id, '-.*', '')) %>% 
-#  mutate(yes_no = if_else(grepl('^P', bird_view) == TRUE, "Yes", "No")) %>% 
-#  select(timestamp, user_id, did, bird_view, yes_no)
-```
-[image]("/codes/location.jpg")
 Let's review whether there are empty or non-assigned geo points for any cells.
 ```{r review, echo=FALSE, comment=NA}
 appear14 %>% 
