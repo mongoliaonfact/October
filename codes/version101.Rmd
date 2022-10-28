@@ -77,18 +77,46 @@ main_tbl %>% head()
 # Two-hours of time interval aggregation (timestamp column) and review the user id: its frequency, count, total number of   user id, sense of tracking individuals 
 # Geo locations (bird view) into visible demonstration of area of the recordings
 ```
-
+Let's review the how 
 ```{r echo=FALSE, comment=NA}
 # FUNC 4: remove parenthesis from POINT column and split the column into
 rmove_parenthesis <- function(df){
         df$bird_view <- gsub('[()]', '', df$bird_view)
         df %>% 
                 separate(bird_view, c('Point', 'Y', 'X'), sep = ' ')}
-
-rmove_parenthesis(appear14) %>% 
-  mutate(twohours = cut(timestamp, breaks = '2 hours')) %>% 
-  select(timestamp, twohours) %>% 
-  head()
-  #group_by(did, twohours) %>%
-  #count(twohours) 
+#"""
+#rmove_parenthesis(appear14)%>% 
+#  #mutate(twohours = cut(timestamp, breaks = '2 hours')) %>% 
+#  mutate(userid = str_replace(user_id, '-.*', '')) %>% 
+#  select(timestamp, Y, X, did, userid) %>% 
+#  write.csv('../data/appear14_geolocation.csv', row.names = FALSE)
+#"""
 ```
+
+```{r echo=FALSE, comment=NA}
+geo_tbl <- rmove_parenthesis(appear14)%>% 
+  mutate(userid = str_replace(user_id, '-.*', '')) %>% 
+  select(timestamp, Y, X, did, userid)
+
+geo_tbl %>% head()
+```
+
+```{r echo=FALSE, comment=NA}
+geo_tbl %>% 
+  mutate(twohours = cut(timestamp, breaks = '2 hours')) %>%
+  select(twohours, Y, X, did, userid) %>% 
+  group_by(twohours, did) %>% count(userid)
+
+```
+Steps took to analyze the geo points include:
+1. Allocate geo points of the each user id
+![Geo Points](../images/appear14_geopoints.jpg)
+2. Draw a polygon that covers SIZ area.
+![SIZ area](../images/appear14_geopoints2.jpg)
+3. Clip the geo points within the polygon of the SIZ area
+
+![Clipped Geo Points within the SIZ area](../images/appear14_clipped.jpg)
+
+3. Color the geo points based on device id
+![Geo Points colored by Device ID](../images/appear14_colored_bydid.jpg)
+
