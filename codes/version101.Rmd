@@ -16,7 +16,7 @@ knitr::opts_chunk$set(echo = TRUE)
 This is an R Markdown document for October data. 
 
 ![Arlington SIZ area and its Fixtures](../images/location.jpg)
-
+# Appearances Dataset
 ```{r cleaning data, include=FALSE, warning=FALSE}
 library(readr)
 library(lubridate)
@@ -118,5 +118,27 @@ Steps took to analyze the geo points include:
 ![Clipped Geo Points within the SIZ area](../images/appear14_clipped.jpg)
 
 3. Color the geo points based on device id
-![Geo Points colored by Device ID](../images/appear14_colored_bydid.jpg)
+![Geo Points colored by Device ID](../images/appear14_colored_bydid.jpg){width=50%, height=50%}
+# LInes Crossed Dataset
+Review data set and its structure, column names.
+```{r echo=FALSE, warning=FALSE, message=FALSE, comment=NA}
+
+crossed14 <- read_csv('../data/lines_crossed 2022-10/lines_crossed_2022-10-14.csv') %>% 
+  mutate(timestamp = as.POSIXct(ts, tz='EST')) %>% 
+  mutate(did = str_replace(device_id, '-.*', '')) 
+
+crossed14 %>% 
+  str()
+```
+
+```{r echo=FALSE, comment=NA}
+
+crossed_count <- crossed14 %>%  
+  rename(too = count) %>% 
+  select(timestamp, did, device_id, label, too) %>%
+  group_by(did, label) %>% summarize(total=sum(too)) %>% 
+  add_column(fixture = c(5,1,7,2))
+
+crossed_count
+```
 
