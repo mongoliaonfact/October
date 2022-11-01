@@ -3,7 +3,7 @@ title: "SIZ October data"
 author: "bbaasan"
 date: "2022-10-24"
 output: word_document
-fontsize: 11pt
+fontsize: 10pt
 ---
 
 ```{r setup, include=FALSE}
@@ -45,6 +45,8 @@ Data seems to contain no empty cells for geographical location for each row cell
 did.table <- as.data.frame(appear14 %>% 
   select(timestamp, did) %>% 
   group_by(did) %>% count(did))
+
+did.table %>% head(2)
 ```
 Let's review the device id (sensors) and its recordings as data frame.
 
@@ -62,7 +64,7 @@ did.table %>%
 appear14 %>% 
   select(timestamp, user_id, did) %>% 
   group_by(timestamp, did) %>% count(user_id) %>% 
-  head()
+  head(2)
 ```
 
 ```{r creating main time table, echo=FALSE, comment=NA}
@@ -84,14 +86,8 @@ rmove_parenthesis <- function(df){
         df$bird_view <- gsub('[()]', '', df$bird_view)
         df %>% 
                 separate(bird_view, c('Point', 'Y', 'X'), sep = ' ')}
-#"""
-#rmove_parenthesis(appear14)%>% 
-#  #mutate(twohours = cut(timestamp, breaks = '2 hours')) %>% 
-#  mutate(userid = str_replace(user_id, '-.*', '')) %>% 
-#  select(timestamp, Y, X, did, userid) %>% 
-#  write.csv('../data/appear14_geolocation.csv', row.names = FALSE)
-#"""
 ```
+
 
 ```{r echo=FALSE, comment=NA}
 geo_tbl <- rmove_parenthesis(appear14)%>% 
@@ -105,7 +101,8 @@ geo_tbl %>% head()
 geo_tbl %>% 
   mutate(twohours = cut(timestamp, breaks = '2 hours')) %>%
   select(twohours, Y, X, did, userid) %>% 
-  group_by(twohours, did) %>% count(userid)
+  group_by(twohours, did) %>% count(userid) %>% 
+  head()
 
 ```
 ## Steps took to analyze the geo points include:
@@ -151,7 +148,7 @@ crossed14_did <- crossed14 %>%
   group_by(twohours, did) %>% summarise(total = sum(count)) %>% 
   pivot_wider(twohours, names_from = did, values_from = total)
 
-crossed14_did
+crossed14_did %>% head()
 
 ```
 
@@ -167,6 +164,9 @@ appear_pivot <- geo_tbl %>%
 appear_pivot %>% dim()
 
 ```
+
+
+
 ```{r echo=FALSE, comment=NA,warning=FALSE, message=FALSE}
 
 appear_crossed_df <- main_tbl %>% 
@@ -179,6 +179,7 @@ appear_crossed_df <- main_tbl %>%
 appear_crossed_df %>% head()
 ```
 ```{r echo=FALSE, comment=NA, warning=FALSE, message=FALSE}
+
 appear_crossed_df %>% 
   mutate(appear_rowsum = rowSums(appear_crossed_df[,2:14])) %>% 
   mutate(crossed_rowsum = rowSums(appear_crossed_df[,15:18])) %>% 
@@ -209,3 +210,50 @@ appear_crossed_df %>%
   #ggsave('../figures/Appearance_LinesCrossed_Linegraph.png')
 
 ```
+```{r echo=FALSE, message=FALSE, comment=NA}
+# this is a function that reads csv file in the path and does conversion
+# and returns converted timestamp, userid, device id (did) and bird_view 
+# geographicall location.
+
+ts_uid_did_bv <- function(csv_file_path){
+  read_csv(csv_file_path) %>% 
+  # for MAC
+  #appear14 <- read_csv("/Users/bb/Documents/Arlington/Arlington/data/Oct/appearances 2022-10/appearances_2022-10-14.csv") %>%
+  select(ts, user_id, device_id, bird_view) %>% 
+  mutate(timestamp = as.POSIXct(ts, tz='EST')) %>% 
+  mutate(userid = str_replace(user_id, '-.*', '')) %>% 
+  mutate(did = str_replace(device_id, '-.*', '')) %>% 
+  select(timestamp, userid, did, bird_view)
+  }
+```
+
+```{r echo=FALSE, message=FALSE, comment=NA}
+# 
+df <- ts_uid_did_bv('../data/appearances 2022-10/appearances_2022-10-15.csv')
+df <- rmove_parenthesis(df) %>% 
+                    select(timestamp, userid, did, Y, X)
+
+```
+
+## save the file in csv format for Qgis upload
+```{r echo=FALSE, message=FALSE, comment=NA}
+# write.csv(df, '../data/appear15_geolocation.csv', row.names = FALSE)
+
+```
+
+Appearance October 15 data seems to follow the same pattern of allocating geo
+points beyond the SIZ area. 
+![Appearance dataset October 15, 2022](../images/appear15_geopoints.jpg)
+```{r echo=FALSE, message=FALSE, comment=NA}
+df16 <- ts_uid_did_bv('../data/appearances 2022-10/appearances_2022-10-16.csv')
+df16 <- rmove_parenthesis(df16) %>% 
+                    select(timestamp, userid, did, Y, X)
+```
+
+```{r echo=FALSE, message=FALSE, comment=NA}
+#write.csv(df16, '../data/appear16_geolocation.csv', row.names = FALSE)
+
+```
+As well as Appearance October 16 data seems to follow the same pattern of allocating geo
+points beyond the SIZ area. 
+![Appearance dataset October 16, 2022](../images/appear16_geopoints.jpg)
