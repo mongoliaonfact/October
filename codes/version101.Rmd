@@ -2,8 +2,8 @@
 title: "SIZ October data"
 author: "bbaasan"
 date: "2022-10-24"
-output:
-  word_document: default
+output: word_document
+fontsize: 11pt
 ---
 
 ```{r setup, include=FALSE}
@@ -108,16 +108,18 @@ geo_tbl %>%
   group_by(twohours, did) %>% count(userid)
 
 ```
-Steps took to analyze the geo points include:
-1. Allocate geo points of the each user id
+## Steps took to analyze the geo points include:
+### 1. Allocate geo points of the each user id
 ![Geo Points](../images/appear14_geopoints.jpg)
-2. Draw a polygon that covers SIZ area.
+
+### 2. Draw a polygon that covers SIZ area.
 ![SIZ area](../images/appear14_geopoints2.jpg)
-3. Clip the geo points within the polygon of the SIZ area
+
+### 3. Clip the geo points within the polygon of the SIZ area
 
 ![Clipped Geo Points within the SIZ area](../images/appear14_clipped.jpg)
 
-3. Color the geo points based on device id
+### 4. Color the geo points based on device id
 ![Geo Points colored by Device ID](../images/appear14_colored_bydid.jpg){width=50%, height=50%}
 # Lines Crossed Dataset
 Review data set and its structure, column names.
@@ -131,7 +133,7 @@ crossed14 %>%
   str()
 ```
 
-```{r echo=FALSE, comment=NA}
+```{r echo=FALSE, comment=NA, message=FALSE}
 
 crossed_count <- crossed14 %>%  
   rename(too = count) %>% 
@@ -141,4 +143,69 @@ crossed_count <- crossed14 %>%
 
 crossed_count
 ```
+```{r echo=FALSE, comment=NA}
+crossed14_did <- crossed14 %>% 
+  select(timestamp, did, count) %>% 
+  mutate(twohours = cut(timestamp, breaks = '2 hours')) %>% 
+  select(twohours, did, count) %>% 
+  group_by(twohours, did) %>% summarise(total = sum(count)) %>% 
+  pivot_wider(twohours, names_from = did, values_from = total)
 
+crossed14_did
+
+```
+
+```{r echo=FALSE, comment=NA, warning=FALSE, message=FALSE}
+appear_pivot <- geo_tbl %>% 
+  mutate(twohours = cut(timestamp, breaks = '2 hours')) %>%
+  select(twohours, Y, X, did, userid) %>% 
+  group_by(twohours, did) %>% count(userid) %>%
+  group_by(twohours, did) %>% summarise(total = sum(n)) %>%  # this sums each user id by device id
+  pivot_wider(twohours, names_from = did, values_from = total) %>% 
+  mutate(timestamp = as.character(twohours))
+
+appear_pivot %>% dim()
+
+```
+```{r echo=FALSE, comment=NA,warning=FALSE, message=FALSE}
+
+appear_crossed_df <- main_tbl %>% 
+  mutate(twohours = as.factor(timestamp)) %>% 
+  right_join(appear_pivot, by="twohours") %>% 
+  right_join(crossed14_did, by="twohours") %>% 
+  select(-c(twohours, timestamp.y)) %>% 
+  replace(is.na(.), 0)
+
+appear_crossed_df %>% head()
+```
+```{r echo=FALSE, comment=NA, warning=FALSE, message=FALSE}
+appear_crossed_df %>% 
+  mutate(appear_rowsum = rowSums(appear_crossed_df[,2:14])) %>% 
+  mutate(crossed_rowsum = rowSums(appear_crossed_df[,15:18])) %>% 
+  select(timestamp.x, appear_rowsum, crossed_rowsum) %>% 
+  pivot_longer(cols = - c(timestamp.x), 
+               names_to = 'dataset', 
+               values_to = 'ppl_count') %>% 
+  ggplot(aes(x=timestamp.x, y=ppl_count, color=dataset))+
+  geom_line(size=1)+
+  geom_point()+
+  ggtitle('Appearance and Lines Crossed Dataset Oct 14')+
+  xlab('Month/Day Time')
+```
+
+```{r echo=FALSE}
+appear_crossed_df %>% 
+  mutate(appear_rowsum = rowSums(appear_crossed_df[,2:14])) %>% 
+  mutate(crossed_rowsum = rowSums(appear_crossed_df[,15:18])) %>% 
+  select(timestamp.x, appear_rowsum, crossed_rowsum) %>% 
+  pivot_longer(cols = - c(timestamp.x), 
+               names_to = 'dataset', 
+               values_to = 'ppl_count') %>% 
+  ggplot(aes(x=timestamp.x, y= log(ppl_count), color=dataset))+
+  geom_line(size=1)+
+  geom_point()+
+  ggtitle('Appearance and Lines Crossed Dataset Oct 14, Log Scale')+
+  xlab('Month/Day Time') #+
+  #ggsave('../figures/Appearance_LinesCrossed_Linegraph.png')
+
+```
