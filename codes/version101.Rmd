@@ -118,6 +118,7 @@ geo_tbl %>%
 
 ### 4. Color the geo points based on device id
 ![Geo Points colored by Device ID](../images/appear14_colored_bydid.jpg){width=50%, height=50%}
+
 # Lines Crossed Dataset
 Review data set and its structure, column names.
 ```{r echo=FALSE, warning=FALSE, message=FALSE, comment=NA}
@@ -257,3 +258,18 @@ df16 <- rmove_parenthesis(df16) %>%
 As well as Appearance October 16 data seems to follow the same pattern of allocating geo
 points beyond the SIZ area. 
 ![Appearance dataset October 16, 2022](../images/appear16_geopoints.jpg)
+
+
+
+
+
+
+```{r }
+#appear_crossed_df %>% 
+#  mutate(appear_rowsum = rowSums(appear_crossed_df[,2:14])) %>% 
+#  mutate(crossed_rowsum = rowSums(appear_crossed_df[,15:18])) %>% 
+#  select(timestamp.x, appear_rowsum, crossed_rowsum) %>% 
+#  write.csv('../data/appear14_main.csv', row.names = FALSE)
+
+```
+
