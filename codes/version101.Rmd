@@ -46,7 +46,7 @@ did.table <- as.data.frame(appear14 %>%
   select(timestamp, did) %>% 
   group_by(did) %>% count(did))
 
-did.table %>% head(2)
+did.table %>% head(5)
 ```
 Let's review the device id (sensors) and its recordings as data frame.
 
@@ -64,9 +64,10 @@ did.table %>%
 appear14 %>% 
   select(timestamp, user_id, did) %>% 
   group_by(timestamp, did) %>% count(user_id) %>% 
-  head(2)
+  head(5)
 ```
-
+## Main table setup for line graph
+This is the main table initial setup for every two hours of interval analysis. Later we will integrate values from Appearances and Lines Crossed datasets to create aggregated relation between two datasets. This helps us to review how entries recorded by the sensors (device id) are put together as line graph.
 ```{r creating main time table, echo=FALSE, comment=NA}
 timestamp <- seq.POSIXt(as.POSIXct('2022-10-14 00:00:00', tz='EST'), 
            as.POSIXct('2022-10-14 23:59:59', tz='EST'), by = "2 hour")
@@ -79,7 +80,8 @@ main_tbl %>% head()
 # Two-hours of time interval aggregation (timestamp column) and review the user id: its frequency, count, total number of   user id, sense of tracking individuals 
 # Geo locations (bird view) into visible demonstration of area of the recordings
 ```
-Let's review the how 
+## Spliting geo location points into separate columns (Graphical purpose).
+Following snippet will extract the geo locational points from the Appearances dataset. Latitude and Longitude will splited into two columns from one column for easier graphical representation. 
 ```{r echo=FALSE, comment=NA}
 # FUNC 4: remove parenthesis from POINT column and split the column into
 rmove_parenthesis <- function(df){
@@ -96,7 +98,8 @@ geo_tbl <- rmove_parenthesis(appear14)%>%
 
 geo_tbl %>% head()
 ```
-
+## Aggreagting user id in Appearances dataset
+This aggregation will help us to count number unique user id (eventually count of an object or a person) every two hours of intervals. In other words, the unique user id for each object in two hours will be counted as on person grouped by device id. Device id and user id are shortened as their first eigth characters from the original long strings. This helps to identify quickly and improve readability. 
 ```{r echo=FALSE, comment=NA}
 geo_tbl %>% 
   mutate(twohours = cut(timestamp, breaks = '2 hours')) %>%
@@ -130,7 +133,7 @@ crossed14 <- read_csv('../data/lines_crossed 2022-10/lines_crossed_2022-10-14.cs
 crossed14 %>% 
   str()
 ```
-
+## General aggregation of the Lines Crossed dataset
 ```{r echo=FALSE, comment=NA, message=FALSE}
 
 crossed_count <- crossed14 %>%  
@@ -162,7 +165,7 @@ appear_pivot <- geo_tbl %>%
   pivot_wider(twohours, names_from = did, values_from = total) %>% 
   mutate(timestamp = as.character(twohours))
 
-appear_pivot %>% dim()
+appear_pivot %>% head()
 
 ```
 
@@ -192,7 +195,8 @@ appear_crossed_df %>%
   geom_line(size=1)+
   geom_point()+
   ggtitle('Appearance and Lines Crossed Dataset Oct 14')+
-  xlab('Month/Day Time')
+  xlab('Month/Day Time')#+
+  #ggsave('../figures/Appearance_LinesCrossed_notransformation.png')
 ```
 
 ```{r echo=FALSE}
@@ -260,16 +264,22 @@ points beyond the SIZ area.
 ![Appearance dataset October 16, 2022](../images/appear16_geopoints.jpg)
 
 
+### Tying the knots together
+Following chunk will create a data frame that contains Appearances and Lines Crossed datasets and summation of the rows of each device ids. This helps to create a line graph how their relationship looks like on the graph. X-axis will be time of two hours of interval from 00:00:01 to 23:59:59 of October 14. 
 
-
-
+Columns with ".y" is device ids for Lines Crossed dataset, and ".x" are device ids of Appearance dataset that uses the same fixtures of the Lines Crossed device ids.
 
 ```{r }
-#appear_crossed_df %>% 
-#  mutate(appear_rowsum = rowSums(appear_crossed_df[,2:14])) %>% 
-#  mutate(crossed_rowsum = rowSums(appear_crossed_df[,15:18])) %>% 
-#  select(timestamp.x, appear_rowsum, crossed_rowsum) %>% 
-#  write.csv('../data/appear14_main.csv', row.names = FALSE)
+appear_crossed_df %>% 
+  mutate(appear_rowsum = rowSums(appear_crossed_df[,2:14])) %>% 
+  mutate(crossed_rowsum = rowSums(appear_crossed_df[,15:18])) #%>% 
+  #select(timestamp.x, appear_rowsum, crossed_rowsum) %>% 
+  #write.csv('../data/appear14_main.csv', row.names = FALSE)
 
 ```
+#TODO:
+## outages: a way to analyze is that whether device id records anything between Oct 14 which is start date and Oct 30 the date that data pulled from icloud last time. 
+```{r echo=FALSE}
 
+
+```
