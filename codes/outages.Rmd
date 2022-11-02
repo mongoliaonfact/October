@@ -1,0 +1,45 @@
+---
+title: "Outages"
+author: "Bat Baasan"
+date: "2022-11-02"
+output: powerpoint_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+
+```{r echo=FALSE, message=FALSE, comment=NA}
+library(tidyverse)
+library(lubridate)
+```
+
+
+## Introduction
+
+This is an R Markdown presentation for outages of the device ids between October 14 and October 30, 2022. 
+
+## Slide with Bullets
+
+- Bullet 1
+- Bullet 2
+- Bullet 3
+
+## Slide with R Output
+```{r echo=FALSE, message=FALSE, comment=NA}
+ts_uid_did_bv <- function(csv_file_path){
+  read_csv(csv_file_path) %>% 
+  select(ts, user_id, device_id, bird_view) %>% 
+  mutate(timestamp = as.POSIXct(ts, tz='EST')) %>% 
+  mutate(userid = str_replace(user_id, '-.*', '')) %>% 
+  mutate(did = str_replace(device_id, '-.*', '')) %>% 
+  select(timestamp, userid, did, bird_view)
+  }
+```
+## Slide with Plot
+
+```{r pressure}
+plot(pressure)
+```
+
