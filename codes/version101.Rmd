@@ -278,8 +278,51 @@ appear_crossed_df %>%
 
 ```
 #TODO:
-## outages: a way to analyze is that whether device id records anything between Oct 14 which is start date and Oct 30 the date that data pulled from icloud last time. 
-```{r echo=FALSE}
+## outages: a way to analyze is that whether device id records anything between Oct 14 which is start date and Oct 30 the date that data pulled from icloud last time.
+#### October 17, Appearance Dataset
+```{r echo=FALSE, warning=FALSE, comment=NA}
+df17 <- ts_uid_did_bv('../data/appearances 2022-10/appearances_2022-10-17.csv')
+df17 <- rmove_parenthesis(df17) %>% 
+                    select(timestamp, userid, did, Y, X)
+```
+#### October 18, Appearance Dataset
+```{r echo=FALSE, warning=FALSE, comment=NA, message=FALSE}
+df18 <- ts_uid_did_bv('../data/appearances 2022-10/appearances_2022-10-18.csv')
+df18 <- rmove_parenthesis(df18) %>% 
+                    select(timestamp, userid, did, Y, X)
+```
 
+#### October 19, Appearances Dataset
+```{r echo=FALSE, warning=FALSE, comment=NA, message=FALSE}
+df19 <- ts_uid_did_bv('../data/appearances 2022-10/appearances_2022-10-19.csv')
+df19 <- rmove_parenthesis(df19) %>% 
+                    select(timestamp, userid, did, Y, X)
+```
 
+#### October 20, Appearances Dataset
+```{r echo=FALSE, warning=FALSE, comment=NA, message=FALSE}
+df20 <- ts_uid_did_bv('../data/appearances 2022-10/appearances_2022-10-20.csv')
+df20 <- rmove_parenthesis(df20) %>% 
+                    select(timestamp, userid, did, Y, X)
+```
+
+#### October 21, Appearances Dataset
+```{r echo=FALSE, warning=FALSE, comment=NA, message=FALSE}
+df21 <- ts_uid_did_bv('../data/appearances 2022-10/appearances_2022-10-21.csv')
+df21 <- rmove_parenthesis(df21) %>% 
+                    select(timestamp, userid, did, Y, X)
+```
+
+#### October 22, Appearances Dataset
+```{r echo=FALSE, warning=FALSE, comment=NA, message=FALSE}
+df22 <- ts_uid_did_bv('../data/appearances 2022-10/appearances_2022-10-22.csv')
+df22 <- rmove_parenthesis(df22) %>% 
+                    select(timestamp, userid, did, Y, X)
+```
+
+#### October 23, Appearances Dataset
+```{r echo=FALSE, warning=FALSE, comment=NA, message=FALSE}
+df23 <- ts_uid_did_bv('../data/appearances 2022-10/appearances_2022-10-23.csv')
+df23 <- rmove_parenthesis(df23) %>% 
+                    select(timestamp, userid, did, Y, X)
 ```
