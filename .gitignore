@@ -43,6 +43,7 @@ vignettes/*.pdf
 Oct_data.zip
 data
 codes/Oct_data
+edited/
 
 # ignore the results
 codes/version101.docx
