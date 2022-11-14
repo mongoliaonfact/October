@@ -23,9 +23,9 @@ library(lubridate)
 library(tidyverse)
 
 # for Windows
-#appear14 <- read_csv("../data/appearances 2022-10/appearances_2022-10-14.csv") %>% 
+appear14 <- read_csv("../data/appearances 2022-10/appearances_2022-10-14.csv") %>% 
   # for MAC
-appear14 <- read_csv("/Users/bb/Desktop/Oct/October/data/appearances 2022-10/appearances_2022-10-14.csv") %>%
+  # appear14 <- read_csv("/Users/bb/Desktop/Oct/October/data/appearances 2022-10/appearances_2022-10-14.csv") %>%
   select(ts, user_id, device_id, bird_view) %>% 
   mutate(timestamp = as.POSIXct(ts, tz='EST')) %>% 
   select(ts, timestamp, user_id, device_id, bird_view) %>% 
